@@ -99,3 +99,10 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# data_set
+data_set/
+
+# generated data
+*.obj
+*.npy
