@@ -1,17 +1,33 @@
 import numpy as np
+import pickle
 
 from feature_extract import filter_word, stem
 
-def create_vector(data, feature_vector,class_list):
-	
-	vectors = []
-	classes = []
+def computeTF(wordDict, bow):
+    tfDict = {}
+    bowCount = len(bow)
+    # print(wordDict)
+    for word, count in wordDict.items():
+        tfDict[word] = count / float(bowCount)
+    return tfDict
 
-	def find_index(word):
-		for i,w in enumerate(feature_vector):
-			if w == word:
-				return i
-		return None
+def computeIDF(docList):
+    import math
+    N = len(docList)
+    #divide N by denominator above, take the log of that
+    for word, val in docList.items():
+        docList[word]= math.log(N / float(val)) 
+
+    return docList
+
+def computeTFIDF(tfBow, idfs):
+    tfidf = {}
+    for word, val in tfBow.items():
+        tfidf[word] = val * idfs[word]
+    return tfidf
+
+def create_vector(data, feature_vector, class_list):
+
 	def find_cls_index(y):
 		for i,c in enumerate(class_list):
 			if c == y:
@@ -19,24 +35,95 @@ def create_vector(data, feature_vector,class_list):
 		print("ERROR. This class does not exist in the list!")
 		quit()
 
-	for words, y in data:
-		vector = np.zeros([len(feature_vector)])
-		c = np.zeros([len(class_list)])
-		for w in words:
-			count = words.count(w)
-			frequency = count / len(words)
-			assert frequency <= 1 and frequency >= 0,"frequency is bigger than 1 or smaller than 0"
-			
-			x_i = find_index(w)
-			
-			if x_i != None:
-				assert x_i >= 0 and x_i < len(feature_vector), "index is smaller than 0 or bigger than size of feature vector i = {0}".format(str(x_i))
 
-			vector[x_i] = frequency
-		y = find_cls_index(y)
-		c[y] = 1
+	vectors = []
+	classes = []
+	for text,c in data:
+		if(len(text) == 0):
+				raise AttributeError("text is empty")
+		
+		# create y
+
+		c = find_cls_index(c)
 		classes.append(c)
-		vectors.append(vector)
-	print("number of vectors created = {0}".format(str(len(vectors))))
 
-	return np.array(vectors), np.array(classes)
+		# create vectors to feed tfidf
+		vector = dict.fromkeys(feature_vector,0)
+		for w in text:
+			if w in feature_vector:
+				vector[w] += 1
+		vectors.append(vector)
+
+
+
+	tfidfs = []
+
+	# calculate tfidfs 
+	idfs = computeIDF(feature_vector)
+
+	for i in range(0,len(data)):
+		tf = computeTF(vectors[i],data[i][0])
+		tfidf = computeTFIDF(tf,idfs)
+		tfidfs.append(np.array(list(tfidf.values())))
+
+	# X and Y // numpy arrays
+	return np.array(tfidfs), np.array(classes)
+
+
+
+# lunch extract before this script
+if __name__=="__main__":
+	
+
+	with open('info.obj', 'rb') as file:
+		info = pickle.load(file)
+
+	with open('data.obj', 'rb') as file:
+		data = pickle.load(file)
+
+	print(info)
+	print("number of data : ", len(data))
+
+	X,Y = something_something_dark_side(data,info.feature_vector,info.class_list)
+
+	for i in range(0,1):
+		print(data[i][0], X[i])
+
+	# # print(data[0])
+
+	# # X, Y = create_vector(data,info.feature_vector,info.class_list)
+
+	# # print(info.feature_vector)
+
+	# # vector = dict.fromkeys(info.feature_vector,0)
+	# vectors = []
+	# for text,_ in data:
+	# 	vector = dict.fromkeys(info.feature_vector,0)
+	# 	for w in text:
+	# 		if w in info.feature_vector:
+	# 			vector[w] += 1
+	# 	vectors.append(vector)
+
+
+
+	# tfidfs = []
+
+	# # calculate tfidfs 
+	# idfs = computeIDF(info.feature_vector)
+
+	# for i in range(0,len(data)):
+	# 	if(len(data[i][0]) == 0):
+	# 		raise AttributeError("text is empty")
+	# 	tf = computeTF(vectors[i],data[i][0])
+	# 	tfidf = computeTFIDF(tf,idfs)
+	# 	tfidfs.append(np.array(list(tfidf.values())))
+
+
+
+
+	# # tf = computeTF(vector,data[0][0])
+	# # # print(tf)
+	# # idfs = computeIDF(info.feature_vector)
+	# # # print(info.feature_vector)
+
+	# # tfidf = computeTFIDF(tf,idfs)

@@ -15,9 +15,9 @@ from vectorize import create_vector
 
 # ''' clustering / kMeans '''
 
-extract = False
-vectorize = False
-n_samples = 200
+extract = True
+vectorize = True
+n_samples = 5000
 
 data = None
 info = None
@@ -43,6 +43,11 @@ if extract:
 
 	'''extract data and save'''
 	data, info = feature_extract(data)
+
+	# somelist = [x for x in somelist if not determine(x)]
+
+	# delete empty elements
+	data = [x for x in data if not len(x[0]) == 0 ]
 
 	file_info = open('info.obj', 'wb')
 	file_data = open('data.obj', 'wb')
@@ -73,11 +78,11 @@ if vectorize:
 # 	X = pickle.load(file)
 # with open('Y', 'rb') as file:
 # 	Y = pickle.load(file)
-X = np.load("X.npy")
-Y = np.load("Y.npy")
-print("number of X = {0}".format(X.shape))
-print("number of Y = {0}".format(Y.shape))
-kmeans(Y[0].shape[0], X)
+# X = np.load("X.npy")
+# Y = np.load("Y.npy")
+# print("number of X = {0}".format(X.shape))
+# print("number of Y = {0}".format(Y.shape))
+# kmeans(Y[0].shape[0], X)
 # prototypes, history_centroids, belongs_to = kmeans(Y[0].shape[0], X)
 # plot(X, history_centroids, belongs_to)
 # import random
