@@ -3,6 +3,7 @@ import pickle
 
 from feature_extract import filter_word, stem
 
+# Term frequency : count / number of words in bow
 def computeTF(wordDict, bow):
     tfDict = {}
     bowCount = len(bow)
@@ -11,6 +12,7 @@ def computeTF(wordDict, bow):
         tfDict[word] = count / float(bowCount)
     return tfDict
 
+# Inverse document frequency : log( total_number_of_documents_in_the_corpus / total_count_of_word )
 def computeIDF(docList):
     import math
     N = len(docList)
@@ -20,12 +22,14 @@ def computeIDF(docList):
 
     return docList
 
+# Term frequency–Inverse document frequency : tf * idf
 def computeTFIDF(tfBow, idfs):
     tfidf = {}
     for word, val in tfBow.items():
         tfidf[word] = val * idfs[word]
     return tfidf
 
+# calculates tfidf for all examples, creates X and Y to feed to any learning algortihm
 def create_vector(data, feature_vector, class_list):
 
 	def find_cls_index(y):
@@ -88,42 +92,3 @@ if __name__=="__main__":
 
 	for i in range(0,1):
 		print(data[i][0], X[i])
-
-	# # print(data[0])
-
-	# # X, Y = create_vector(data,info.feature_vector,info.class_list)
-
-	# # print(info.feature_vector)
-
-	# # vector = dict.fromkeys(info.feature_vector,0)
-	# vectors = []
-	# for text,_ in data:
-	# 	vector = dict.fromkeys(info.feature_vector,0)
-	# 	for w in text:
-	# 		if w in info.feature_vector:
-	# 			vector[w] += 1
-	# 	vectors.append(vector)
-
-
-
-	# tfidfs = []
-
-	# # calculate tfidfs 
-	# idfs = computeIDF(info.feature_vector)
-
-	# for i in range(0,len(data)):
-	# 	if(len(data[i][0]) == 0):
-	# 		raise AttributeError("text is empty")
-	# 	tf = computeTF(vectors[i],data[i][0])
-	# 	tfidf = computeTFIDF(tf,idfs)
-	# 	tfidfs.append(np.array(list(tfidf.values())))
-
-
-
-
-	# # tf = computeTF(vector,data[0][0])
-	# # # print(tf)
-	# # idfs = computeIDF(info.feature_vector)
-	# # # print(info.feature_vector)
-
-	# # tfidf = computeTFIDF(tf,idfs)

@@ -109,7 +109,3 @@ def feature_extract(data, threshold = .3):
 		len_feature_vector_before_thresholding)
 
 	return new_data, info
-
-
-# tf_idf
-# import lda
