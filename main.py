@@ -1,7 +1,6 @@
 import numpy as np
 import pickle
 
-from kmeans import kmeans, plot
 from data import get_data
 from feature_extract import feature_extract
 from vectorize import create_vector
@@ -11,20 +10,20 @@ from vectorize import create_vector
 
 # ''' feature vector or dictionary '''
 
-# ''' preprocessing / term frequency - importance '''
+# ''' preprocessing / tfidf '''
 
 # ''' clustering / kMeans '''
 
 extract = True
 vectorize = True
-n_samples = 5000
+n_samples = 380000
 
 data = None
 info = None
 X = None
 Y = None
 
-
+# extract features
 if extract:
 
 	'''Load data'''
@@ -42,7 +41,7 @@ if extract:
 	data = data[:n_samples]
 
 	'''extract data and save'''
-	data, info = feature_extract(data)
+	data, info = feature_extract(data, threshold = .3)
 
 	# somelist = [x for x in somelist if not determine(x)]
 
@@ -58,6 +57,7 @@ if extract:
 with open('info.obj', 'rb') as file:
 	info = pickle.load(file)
 
+# vectorize
 if vectorize:
 	with open('data.obj', 'rb') as file:
 		data = pickle.load(file)
@@ -69,23 +69,44 @@ if vectorize:
 	
 	np.save("X",X)
 	np.save("Y",Y)
-	# file_X = open('X', 'wb')
-	# file_Y = open('Y', 'wb')
-	# pickle.dump(X,file_X)
-	# pickle.dump(Y,file_Y)
 
-# with open('X', 'rb') as file:
-# 	X = pickle.load(file)
-# with open('Y', 'rb') as file:
-# 	Y = pickle.load(file)
-# X = np.load("X.npy")
-# Y = np.load("Y.npy")
-# print("number of X = {0}".format(X.shape))
-# print("number of Y = {0}".format(Y.shape))
-# kmeans(Y[0].shape[0], X)
-# prototypes, history_centroids, belongs_to = kmeans(Y[0].shape[0], X)
-# plot(X, history_centroids, belongs_to)
-# import random
-# rnd = random.randint(0, len(data)-1)
-# filtered = filter_word(data[rnd][0])
-# print(stem(filtered), "\t", data[rnd][1])
+
+'''final touches'''
+if type(X) != type(np.array([1])):
+	X = np.load("X.npy")
+if type(Y) != type(np.array([1])):
+	Y = np.load("Y.npy")
+
+if X.shape[0] == Y.shape[0]:
+	print("Number of examples = {}\n".format(X.shape[0]))
+else:
+	print("Number of examples and classes does not match")
+	print("n_examples : {}\tn_classes : {}".format(X.shape[0] , Y.shape[0]))
+	quit()
+print("---------- INFO ----------\n")
+print(info)
+print("--------------------------\n")
+
+
+'''CLUSTERING'''
+n_examples = int(X.shape[0])
+n_clusters = 10
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=n_clusters, random_state=0, init = "random", max_iter = 10000000).fit(X[:n_examples])
+# print(kmeans.labels_)
+
+predicted = {}
+for l in kmeans.labels_:
+	if l not in predicted.keys():
+		predicted[l] = 0
+	predicted[l] += 1
+print("-----predicted-----")
+print(sorted(predicted.values()))
+print("-------------------")
+
+ys = {}
+for l in Y:
+	if l not in ys.keys():
+		ys[l] = 0
+	ys[l] += 1
+print(sorted(ys.values()))
