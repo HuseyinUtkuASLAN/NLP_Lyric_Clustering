@@ -39,17 +39,17 @@ def filter_word(text):
 	return wordsFiltered
 
 
-def stem(wordsFiltered, ps = PorterStemmer()):
+def stem(wordsFiltered, st = PorterStemmer()):
 	
 	stemed = []
 	for i,w in enumerate(wordsFiltered):
-		stemed.append(ps.stem(w))
+		stemed.append(st.stem(w))
 
 	return stemed
 
 
 
-def feature_extract(data, threshold = .3):
+def feature_extract(data, threshold = .3, st = PorterStemmer()):
 
 
 	
@@ -67,7 +67,7 @@ def feature_extract(data, threshold = .3):
 			class_list.append(d[1])
 
 		wordsFiltered = filter_word(d[0])
-		wordsFiltered = stem(wordsFiltered)
+		wordsFiltered = stem(wordsFiltered,st)
 		new_data.append((wordsFiltered, d[1]))
 		# print(wordsFiltered ,"\n\n")
 		for word in wordsFiltered:

@@ -1,7 +1,8 @@
 import numpy as np
 import pickle
-from plot import plot_clusters
+import nltk
 
+from plot import plot_clusters
 from data import get_data
 from feature_extract import feature_extract
 from vectorize import create_vector
@@ -42,8 +43,8 @@ if extract:
 	data = data[:n_samples]
 
 	'''extract data and save'''
+	# data, info = feature_extract(data, threshold = 0.3,st = nltk.stem.SnowballStemmer('english'))
 	data, info = feature_extract(data, threshold = 0.3)
-
 	# somelist = [x for x in somelist if not determine(x)]
 
 	# delete empty elements
