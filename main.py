@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+from plot import plot_clusters
 
 from data import get_data
 from feature_extract import feature_extract
@@ -16,7 +17,7 @@ from vectorize import create_vector
 
 extract = True
 vectorize = True
-n_samples = 380000
+n_samples = 10000
 
 data = None
 info = None
@@ -41,7 +42,7 @@ if extract:
 	data = data[:n_samples]
 
 	'''extract data and save'''
-	data, info = feature_extract(data, threshold = .3)
+	data, info = feature_extract(data, threshold = 0.3)
 
 	# somelist = [x for x in somelist if not determine(x)]
 
@@ -89,24 +90,49 @@ print("--------------------------\n")
 
 
 '''CLUSTERING'''
-n_examples = int(X.shape[0])
+n_examples = int(X.shape[0] * .9 )
+print("Number of examples used during traning = {}".format(n_examples))
 n_clusters = 10
 from sklearn.cluster import KMeans
-kmeans = KMeans(n_clusters=n_clusters, random_state=0, init = "random", max_iter = 10000000).fit(X[:n_examples])
+kmeans = KMeans(n_clusters=n_clusters, random_state=1, init = "random", max_iter = 100000).fit(X[:n_examples])
 # print(kmeans.labels_)
 
-predicted = {}
-for l in kmeans.labels_:
-	if l not in predicted.keys():
-		predicted[l] = 0
-	predicted[l] += 1
-print("-----predicted-----")
-print(sorted(predicted.values()))
-print("-------------------")
+predicted_Y = kmeans.predict(X[n_examples:])
 
-ys = {}
-for l in Y:
-	if l not in ys.keys():
-		ys[l] = 0
-	ys[l] += 1
-print(sorted(ys.values()))
+predicted = {}
+for i in range(0,10):
+	predicted[i] = {}
+	for j in range(0,10):
+		predicted[i][j] = 0
+Y_tmp = Y[n_examples:]
+
+for i,pred in enumerate(predicted_Y):
+	predicted[pred][Y[n_examples + i]] += 1 
+
+plot_datas = []
+for p in predicted.values():
+	p = list(p.values())
+	plot_datas.append(p)
+	print(p)
+
+plot_clusters(plot_datas,N = 10,n_column = 2)
+
+# predicted = {}
+# for l in kmeans.labels_:
+# 	if l not in predicted.keys():
+# 		predicted[l] = 0
+# 	predicted[l] += 1
+# print("-----predicted-----")
+# print(sorted(predicted.values()))
+# print("-------------------")
+
+# ys = {}
+# for l in Y:
+# 	if l not in ys.keys():
+# 		ys[l] = 0
+# 	ys[l] += 1
+# print(sorted(ys.values()))
+
+
+
+# python -i main.py
