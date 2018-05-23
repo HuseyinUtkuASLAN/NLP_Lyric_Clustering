@@ -22,7 +22,7 @@ def get_data(data):
 			for i,row in enumerate(csv_reader):
 				if(i == 0):
 					continue
-				data_set.append((row[5],row[4]))
+				data_set.append((row[5],row[4],row[2]))
 		return data_set
 
 

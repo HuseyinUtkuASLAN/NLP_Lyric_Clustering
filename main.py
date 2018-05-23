@@ -16,9 +16,11 @@ from vectorize import create_vector
 
 # ''' clustering / kMeans '''
 
-extract = True
+extract = False
 vectorize = True
 n_samples = 10000
+n_clusters = 2
+
 
 data = None
 info = None
@@ -35,11 +37,23 @@ if extract:
 
 	data = get_data(data_name)
 
-	
-	# suffle data
-	from random import shuffle
-	shuffle(data)
 
+	data = [x for x in data if int(x[2]) == 2009 and (x[1] == "Rock" or x[1] == "Pop" )  ]
+
+	genres = {}
+	for d in data:
+		if d[1] not in genres.keys():
+			genres[d[1]] = 0
+		genres[d[1]] += 1
+
+	print(genres)
+
+	# suffle data
+	# from random import shuffle
+	# shuffle(data)
+
+
+	# quit()
 	data = data[:n_samples]
 
 	'''extract data and save'''
@@ -93,13 +107,13 @@ print("--------------------------\n")
 '''CLUSTERING'''
 n_examples = int(X.shape[0] * .9 )
 print("Number of examples used during traning = {}".format(n_examples))
-n_clusters = 10
+
 from sklearn.cluster import KMeans
 kmeans = KMeans(n_clusters=n_clusters, random_state=1, init = "random", max_iter = 100000).fit(X[:n_examples])
 # print(kmeans.labels_)
 
 predicted_Y = kmeans.predict(X[n_examples:])
-
+print(predicted_Y)
 predicted = {}
 for i in range(0,10):
 	predicted[i] = {}
@@ -114,7 +128,8 @@ plot_datas = []
 for p in predicted.values():
 	p = list(p.values())
 	plot_datas.append(p)
-	print(p)
+	# print(p)
+
 
 plot_clusters(plot_datas,N = 10,n_column = 2)
 
