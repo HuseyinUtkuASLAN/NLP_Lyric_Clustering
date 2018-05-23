@@ -103,6 +103,9 @@ ENV/
 # data_set
 data_set/
 
+# data_frame
+data_frame/
+
 # generated data
 *.obj
 *.npy
